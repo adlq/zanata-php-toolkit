@@ -2,7 +2,7 @@
 /**
  * Craft the required Zanata API URL
  */
-class ZanataApiUrlCrafter
+class ZanataApiUrl
 {
 	// Base URL of the Zanata instance
 	private $baseUrl;
@@ -42,9 +42,12 @@ class ZanataApiUrlCrafter
 	 * @param string  $iterationSlug	The project version
 	 * @return string The API URL
 	 */
-	public function projectIterationService($projectSlug, $iterationSlug)
+	public function projectIterationService(
+      $projectSlug, 
+      $iterationSlug)
 	{
-		return $this->projectService($projectSlug) . "/iterations/i/$iterationSlug";
+		return $this->projectService($projectSlug) 
+        . "/iterations/i/$iterationSlug";
 	}
 	
 	/**
@@ -54,9 +57,13 @@ class ZanataApiUrlCrafter
 	 * @param sting	  $docName		  The document name
 	 * @return string The API URL
 	 */
-	public function sourceDocResourceService($projectSlug, $iterationSlug, $docName)
+	public function sourceDocResourceService(
+      $projectSlug, 
+      $iterationSlug, 
+      $docName)
 	{
-		return $this->projectIterationService($projectSlug, $iterationSlug) . "/r/$docName?ext=gettext";
+		return $this->projectIterationService($projectSlug, $iterationSlug) 
+        . "/r/$docName?ext=gettext";
 	}
 
 }

@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  * cURL Wrapper
  */
@@ -37,29 +35,28 @@ class CurlWrapper
 	
 	/**
 	 * Execute the cURL call
-	 * @param boolean	$displayResponse	If true, display the cURL result, not otherwise
-	 * @return boolean	True if the cURL call was successful, False otherwise
+	 * @return mixed	cURL response if the cURL call was successful, False otherwise
 	 */
-	public function fetch($displayResponse = false)
+	public function fetch()
 	{
 		// Execute the cURL call
 		$response = curl_exec($this->getHandle());
-		
-		if ($displayResponse)
-			echo $response;
-
+    $response = $response === '' ? true : $response;
+    
 		// Report the outcome to the user
 		$result = $this->reportOutcome();
 		
 		// Close the cURL handle
 		curl_close($this->getHandle());
-		
+    
+		if ($result)
+      return $response;
 		return $result;
 	}
 	
   /**
-   * given the HTTP response code. 
-   * Notify the user of the cURL outcome with the appropriate message, 
+   * Given the HTTP response code,
+   * Notify the user of the cURL outcome with the appropriate message
    * 
 	 * @return boolean	True if the cURL call was successful, False otherwise
 	 */

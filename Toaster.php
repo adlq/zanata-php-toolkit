@@ -1,5 +1,5 @@
 <?php
-require_once('POFile.php');
+require_once('pophp/POFile.php');
 require_once('CurlWrapper.php');
 require_once('ZanataApiUrlCrafter.php');
 

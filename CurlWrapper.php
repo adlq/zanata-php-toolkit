@@ -41,7 +41,7 @@ class CurlWrapper
 	{
 		// Execute the cURL call
 		$response = curl_exec($this->getHandle());
-    $response = $response === '' ? true : $response;
+    $finalResponse = $response === '' ? true : $response;
     
 		// Report the outcome to the user
 		$result = $this->reportOutcome();
@@ -50,7 +50,9 @@ class CurlWrapper
 		curl_close($this->getHandle());
     
 		if ($result)
-      return $response;
+		{
+			return $finalResponse;
+		}
 		return $result;
 	}
 	

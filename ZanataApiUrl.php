@@ -54,16 +54,23 @@ class ZanataApiUrl
 	 * Craft the URL corresponding to the SourceDocResouceService endpoint
 	 * @param string  $projectSlug	  The project slug (short name)
 	 * @param string  $iterationSlug  The project version
-	 * @param sting	  $docName		  The document name
+	 * @param string	  $docName		  The document name
+	 * @param boolean $ext Whether to specify the 'gettext' extension in the URL
 	 * @return string The API URL
 	 */
 	public function sourceDocResourceService(
       $projectSlug, 
       $iterationSlug, 
-      $docName)
+      $docName,
+			$ext = false)
 	{
-		return $this->projectIterationService($projectSlug, $iterationSlug) 
-        . "/r/$docName?ext=gettext";
+		$result = $this->projectIterationService($projectSlug, $iterationSlug) 
+        . "/r/$docName";
+		if ($ext)
+		{
+			$result .= '?ext=gettext';
+		}
+		return $result;
 	}
 	
 	/**

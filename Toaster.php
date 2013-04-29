@@ -103,10 +103,6 @@ class Toaster
 			$sourceDocName,
 			$destLocale)
 	{
-		// Extract the source document name from the absolute path
-		$basename = basename($resourceFilePath);
-		$sourceDocName = pathinfo($basename, PATHINFO_FILENAME);
-		
     // Parse the resource (POT) file
     $poFile = new POFile($resourceFilePath);
 

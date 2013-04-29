@@ -203,7 +203,7 @@ class ZanataApiCurlRequest {
     // Initialize a cURL call with the right options
     $putSourceDocCall = new CurlWrapper(
         $this->getZanataApiUrl()->sourceDocResourceService(
-            $projectSlug, $iterationSlug, $sourceDocName), 
+            $projectSlug, $iterationSlug, $sourceDocName, true), 
         $this->getPutOptions($putSourceDocJson));
         
     // Execute it

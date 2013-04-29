@@ -25,10 +25,16 @@ switch($repoName)
 	case 'trunk.elms':
 		$projectSlug = 'lms';
 		$iterationSlug = '13.1';
-		
+		break;
+	case 'trunk.elms':
+		$projectSlug = 'lms';
+		$iterationSlug = '12.1';
+		break;
+	default:
+		exit('Unknown project');
 }
 
-$toast = new Toaster($user, $apiKey, $projectSlug, $iterationSlug, 'lang.pot', $zanataUrl);
+$toast = new Toaster($user, $apiKey, $projectSlug, $iterationSlug, $potFilePath, $zanataUrl);
 
 exit($toast->launch());
 ?>

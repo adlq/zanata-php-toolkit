@@ -231,7 +231,7 @@ class ZanataApiCurlRequest {
 			$locale,
 			$entries)
 	{
-		$transState = 'Approved';
+		$transState = '';
 		$textFlowTargets = array();
 
 		foreach($entries as $entry) 
@@ -247,6 +247,8 @@ class ZanataApiCurlRequest {
 			{
 				// Hash the msgid and msgctxt
 				$stringId = hash('sha256', $context . $source);
+				
+				$transState = $entry->isFuzzy() ? 'NeedReview' : 'Approved';
 				
 				array_push($textFlowTargets, array(
 					"resId" => $stringId,
@@ -268,7 +270,7 @@ class ZanataApiCurlRequest {
             $projectSlug, 
 						$iterationSlug, 
 						$sourceDocName,
-						$locale), 
+						$locale, 'import'), 
         $this->getPutOptions($putTranslationsJson));
         
     // Execute it

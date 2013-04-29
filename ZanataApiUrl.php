@@ -65,6 +65,26 @@ class ZanataApiUrl
 		return $this->projectIterationService($projectSlug, $iterationSlug) 
         . "/r/$docName?ext=gettext";
 	}
+	
+	/**
+	 * Craft the URL corresponding to the TranslatedDocResourceService endpoint
+	 * @param string $projectSlug The project slug
+	 * @param string $iterationSlug The project version
+	 * @param string $docName The document name
+	 * @param string $locale The locale
+	 * @return string The API URL
+	 */
+	public function translatedDocResourceService(
+			$projectSlug,
+			$iterationSlug,
+			$docName,
+			$locale)
+	{
+		return $this->sourceDocResourceService(
+				$projectSlug,
+				$iterationSlug, 
+				$docName) . "/translations/$locale";
+	}
 
 }
 ?>

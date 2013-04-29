@@ -3,8 +3,7 @@ require_once('pophp/POFile.php');
 require_once('ZanataApiCurlRequest.php');
 
 /**
- * Push source entries to a specified Zanata installation
- * given a POT file
+ * Zanata Toolkit
  */
 class Toaster
 {
@@ -27,7 +26,6 @@ class Toaster
 	 * @param string $apiKey			The API key
 	 * @param string $projectSlug		The project slug (short name)
 	 * @param string $iterationSlug		The project version
-	 * @param string $resourceFilePath	The absolute path to the POT file
 	 * @param string $zanataHost		URL where the Zanata instance 
    *                              is hosted, must not end with '/'
 	 */
@@ -36,31 +34,15 @@ class Toaster
       $apiKey, 
       $projectSlug, 
       $iterationSlug, 
-      $resourceFilePath, 
       $baseUrl)
 	{
 		$this->projectSlug = $projectSlug;
 		$this->iterationSlug = $iterationSlug;
-		$this->resourceFilePath = $resourceFilePath;
-		$this->sourceLocale = 'en-GB';
-		
-		// Extract the source document name from the absolute path
-		$basename = basename($resourceFilePath);
-		$this->sourceDocName = pathinfo($basename, PATHINFO_FILENAME);
 		
 		$this->zanataCurlRequest = new ZanataApiCurlRequest(
         $user, $apiKey, $baseUrl);
-	}
-	
-	/**
-	 * Push the source entries to Zanata, 
-   * creating the project/project version if necessary
-	 * 
-	 * @return	boolean	  False if the push has succeeded, True otherwise
-	 *			(hook exit code)
-	 */
-	public function launch() 
-	{
+		
+		// Check to see whether the given project exists
 		$projectExists = $this->getZanataCurlRequest()->getProject(
         $this->getProjectSlug());
     
@@ -84,8 +66,26 @@ class Toaster
           $this->getProjectSlug(), $this->getIterationSlug());
     }
 
+	}
+	
+	/**
+	 * Push the source POT entries to Zanata, 
+   * creating the project/project version if necessary
+	 * 
+	 * @param string $resourceFilePath Full path to the POT file
+	 * @param string $sourceLocale The source locale
+	 * @return	boolean	  False if the push has succeeded, True otherwise
+	 *			(hook exit code)
+	 */
+	public function pushPotEntries($resourceFilePath, $sourceLocale) 
+	{
+		// Extract the source document name from the absolute path
+		$basename = basename($resourceFilePath);
+		$sourceDocName = pathinfo($basename, PATHINFO_FILENAME);
+		
+		
     // Parse the resource (POT) file
-    $potFile = new POFile($this->getResourceFilePath());
+    $potFile = new POFile($resourceFilePath);
 
     // Retrieve its entries
     $potEntries = $potFile->getEntries();
@@ -94,35 +94,31 @@ class Toaster
     return !($this->getZanataCurlRequest()->putSourceDoc(
         $this->getProjectSlug(), 
         $this->getIterationSlug(),
-        $this->getSourceDocName(), 
-        $this->getSourceLocale(), $potEntries));
-	}
-
-	/**
-	 * Retrieve the absolute path to the resource (POT) file
-	 * @return string
-	 */
-	public function getResourceFilePath()
-	{
-		return $this->resourceFilePath;
+        $sourceDocName, 
+        $sourceLocale, $potEntries));
 	}
 	
-	/**
-	 * Retrieve the POT file's name
-	 * @return string
-	 */
-	public function getSourceDocName()
+	public function pushTranslations(
+			$resourceFilePath, 
+			$sourceDocName,
+			$destLocale)
 	{
-		return $this->sourceDocName;
-	}
+		// Extract the source document name from the absolute path
+		$basename = basename($resourceFilePath);
+		$sourceDocName = pathinfo($basename, PATHINFO_FILENAME);
+		
+    // Parse the resource (POT) file
+    $poFile = new POFile($resourceFilePath);
 
-	/**
-	 * Retrieve the source locale
-	 * @return string
-	 */
-	public function getSourceLocale()
-	{
-		return $this->sourceLocale;
+    // Retrieve its entries
+    $poEntries = $poFile->getEntries();
+
+    // Send the entries to Zanata
+    return !($this->getZanataCurlRequest()->putTranslations(
+        $this->getProjectSlug(), 
+        $this->getIterationSlug(),
+        $sourceDocName, 
+        $destLocale, $poEntries));
 	}
 
 	/**

@@ -211,6 +211,71 @@ class ZanataApiCurlRequest {
   }
   
   /**
+   * Create or modify the translations in the given locale 
+	 * for the given source document in the given iteration 
+	 * of the given project.
+   * 
+   * @param string $projectSlug The project slug
+   * @param string $iterationSlug The project version
+   * @param string $sourceDocName The name of the source document
+   * @param string $locale The locale
+   * @param array<POEntry> $entries An array containing the parsed POT
+   * entries
+   * @return boolean True if the operation was successful, False 
+   * otherwise
+   */
+	public function putTranslations(
+			$projectSlug,
+			$iterationSlug,
+			$sourceDocName,
+			$locale,
+			$entries)
+	{
+		$transState = 'Approved';
+		$textFlowTargets = array();
+
+		foreach($entries as $entry) 
+		{
+
+			// Retrieve entry's data
+			$source = $entry->getSource();
+			$target = $entry->getTarget();
+			$context = $entry->getContext();
+
+			// Only process if the entry has a non-empty msgid and msgstr
+			if($source !== '' && $target !== '')
+			{
+				// Hash the msgid and msgctxt
+				$stringId = hash('sha256', $context . $source);
+				
+				array_push($textFlowTargets, array(
+					"resId" => $stringId,
+					"state" => $transState,
+					"content" => $target,
+					"extensions" => array()));
+			}
+		}
+		
+
+		$putTranslationsJson = json_encode(array(   
+			"extensions" => array(),
+			"textFlowTargets" => $textFlowTargets
+    ));
+    
+    // Initialize a cURL call with the right options
+    $putTranslationsCurl = new CurlWrapper(
+        $this->getZanataApiUrl()->translatedDocResourceService(
+            $projectSlug, 
+						$iterationSlug, 
+						$sourceDocName,
+						$locale), 
+        $this->getPutOptions($putTranslationsJson));
+        
+    // Execute it
+    return $putTranslationsCurl->fetch();
+	}
+	
+  /**
    * Retrieve options for a cURL PUT request
    * 
    * @param array $data The (JSON) data to be sent via PUT

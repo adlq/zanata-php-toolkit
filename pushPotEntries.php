@@ -34,8 +34,7 @@ else
 }
 
 // Update the source entries on Zanata!
-$toast = new Toaster($user, $apiKey, $projectSlug, $iterationSlug, $potFilePath, $zanataUrl);
+$toast = new Toaster($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl);
 
-// exit with the appropriate code
-exit($toast->launch());
+exit($toast->pushPotEntries($potFilePath, 'en-GB'));
 ?>

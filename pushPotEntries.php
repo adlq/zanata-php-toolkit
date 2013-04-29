@@ -9,6 +9,7 @@ if (count($argv) < 3)
 
 require_once('Toaster.php');
 
+// Parse the ini file 
 $configs = parse_ini_file('config.ini', true);
 
 $zanataUrl = $configs['Zanata']['url'];
@@ -17,24 +18,24 @@ $apiKey = $configs['Zanata']['api_key'];
 $projectSlug = '';
 $iterationSlug = '';
 
+// Extract the repo name and POT file path from the parameters
 $repoName = $argv[1];
 $potFilePath = $argv[2];
 
-switch($repoName)
+// Attempt to find the repo name in the config.ini file
+if (isset($configs[$repoName]))
 {
-	case 'trunk.elms':
-		$projectSlug = 'lms';
-		$iterationSlug = '13.1';
-		break;
-	case 'trunk.elms':
-		$projectSlug = 'lms';
-		$iterationSlug = '12.1';
-		break;
-	default:
-		exit('Unknown project');
+	$projectSlug = $configs[$repoName]['project_slug'];
+	$iterationSlug = $configs[$repoName]['iteration_slug'];
+}
+else
+{
+	exit('Unknown project, no section $repoName in config.ini file');
 }
 
+// Update the source entries on Zanata!
 $toast = new Toaster($user, $apiKey, $projectSlug, $iterationSlug, $potFilePath, $zanataUrl);
 
+// exit with the appropriate code
 exit($toast->launch());
 ?>

@@ -46,8 +46,7 @@ class Toaster
 		
 		// Extract the source document name from the absolute path
 		$basename = basename($resourceFilePath);
-		$this->sourceDocName = substr(
-        $basename, 0, strpos($basename, '.'));
+		$this->sourceDocName = pathinfo($basename, PATHINFO_FILENAME);
 		
 		$this->zanataCurlRequest = new ZanataApiCurlRequest(
         $user, $apiKey, $baseUrl);

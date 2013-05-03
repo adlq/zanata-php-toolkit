@@ -86,12 +86,16 @@ class ZanataApiUrl
 			$iterationSlug,
 			$docName,
 			$locale,
-			$merge)
+			$merge = '')
 	{
-		return $this->sourceDocResourceService(
+		$result = $this->sourceDocResourceService(
 				$projectSlug,
 				$iterationSlug, 
-				$docName) . "/translations/$locale?merge=" . $merge;
+				$docName) . "/translations/$locale";
+		if ($merge !== '')
+			$result .= "?merge=" . $merge;
+		
+		return $result;
 	}
 
 }

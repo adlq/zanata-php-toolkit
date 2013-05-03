@@ -231,9 +231,45 @@ class ZanataApiCurlRequest {
 			$locale,
 			$entries)
 	{
+		// Initialize necessary variables
 		$transState = '';
 		$textFlowTargets = array();
+		$textFlowTargetIds = array();
+		
+		// Retrieve the existing translations
+		$retrieve = new CurlWrapper(
+				$this->getZanataApiUrl()->translatedDocResourceService(
+						$projectSlug, 
+						$iterationSlug, 
+						$sourceDocName,
+						$locale), $this->getDefaultCurlOptions());
 
+		// If the retrieval was successful
+		if ($retrieve != false)
+		{
+			// Convert the JSON response to an associative array
+			$existingTranslations = json_decode($retrieve->fetch(), true);
+			
+			// Push the existing translations onto the text flow targets array
+			foreach($existingTranslations['textFlowTargets'] as $tfTarget)
+			{
+				// So we don't lose any old translations 
+				array_push($textFlowTargets, array(
+					'resId' => $tfTarget['resId'],
+					'state' => $tfTarget['state'],
+					'content' => $tfTarget['content'],
+					'extensions' => array(),
+					'revision' => $tfTarget['revision'],
+					'textFlowRevision' => $tfTarget['textFlowRevision']
+					));
+
+				// Update the second array, that will help to quickly target 
+				// a specific entry in the first array using only its resId
+				$textFlowTargetIds[$tfTarget['resId']] = key($textFlowTargets);
+			}
+		}
+	
+		// Loop over all the PO entries obtained by parsing the file
 		foreach($entries as $entry) 
 		{
 
@@ -247,22 +283,41 @@ class ZanataApiCurlRequest {
 			{
 				// Hash the msgid and msgctxt
 				$stringId = hash('sha256', $context . $source);
-				
 				$transState = $entry->isFuzzy() ? 'NeedReview' : 'Approved';
 				
-				array_push($textFlowTargets, array(
-					"resId" => $stringId,
-					"state" => $transState,
-					"content" => $target,
-					"extensions" => array()));
+				if (array_key_exists($stringId, $textFlowTargetIds))
+				{
+					// There is an existing translation for the current source entry 
+					// This means that we want to update this translation, i.e. replace 
+					// it with the new translation
+					// If the new translation is, for some reasons, fuzzy, then we keep
+					// the original translation
+					if ($target !== $textFlowTargets[$textFlowTargetIds[$stringId]]['content']
+							&& !$entry->isFuzzy())
+					{
+						$textFlowTargets[$textFlowTargetIds[$stringId]]['content'] = $target;
+					}
+				}
+				else
+				{
+					// No translation exists for the current source entry
+					// In this case, we simply push the new translations to the text flow
+					// targets array
+					array_push($textFlowTargets, array(
+						"resId" => $stringId,
+						"state" => $transState,
+						"content" => $target,
+						"extensions" => array()));
+				}
 			}
 		}
-		
 
+		// Prepare the JSON content to send via cURL
 		$putTranslationsJson = json_encode(array(   
 			"extensions" => array(),
 			"textFlowTargets" => $textFlowTargets
     ));
+	
     
     // Initialize a cURL call with the right options
     $putTranslationsCurl = new CurlWrapper(

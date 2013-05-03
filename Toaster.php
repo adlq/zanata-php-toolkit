@@ -98,6 +98,14 @@ class Toaster
         $sourceLocale, $potEntries));
 	}
 	
+	/**
+	 * Push a set of translations from a PO file to the Zanata platform
+	 * @param string $resourceFilePath Absolute path to the PO file
+	 * @param string $sourceDocName Name of the source document on Zanata 
+	 * @param string $destLocale Name of the target locale
+	 * @return boolean False if the push has succeeded, True otherwise
+	 *			(hook exit code)
+	 */
 	public function pushTranslations(
 			$resourceFilePath, 
 			$sourceDocName,

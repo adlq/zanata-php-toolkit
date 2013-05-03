@@ -126,6 +126,8 @@ Thumbs.db
 # Folder config file
 Desktop.ini
 
+*.ini
+
 
 #############
 ## Python
@@ -155,6 +157,8 @@ pip-log.txt
 
 #Translations
 *.mo
+*.pot
+*.po
 
 #Mr Developer
 .mr.developer.cfg

@@ -4,9 +4,13 @@
  */
 class CurlWrapper
 {
+  // cURL URL
   private $url;
+  // cURL options
 	private $options;
+  // cURL handle
 	private $handle;
+  // cURL response code and their associated messages
 	private $curlResponseMessages = array(
 		'0' => 'Could not connect to server',
 		'201' => 'Document created',
@@ -15,16 +19,25 @@ class CurlWrapper
 		'403' => 'Update forbidden',
 		'401' => 'Unauthorized',
 		'500' => 'Internal server error');
+  // Boolean indicating verbose mode or not
+  private $verbose;
+  // String describing the purpose of the cURL call
+  private $description;
 	
 	/**
 	 * Constructor
-	 * @param string	$url
-	 * @param array		$options
+	 * @param string	$url The cURL URL
+	 * @param array		$options The cURL options
+   * @param boolean $verbose True to enable verbose mode
 	 */
-	public function __construct($url, $options)
+	public function __construct($url, $options, 
+      $verbose = false,
+      $description = '')
 	{
 		if ($url !== '')
 		{
+      $this->verbose = $verbose;
+      $this->description = $description;
 			// Initialize the cURL handle with the crafted API URL
 			$this->handle = curl_init($url);
 
@@ -68,9 +81,17 @@ class CurlWrapper
 		// Retrieve the cURL response
 		$curlResponse = curl_getinfo($this->getHandle(), CURLINFO_HTTP_CODE);
 		
-		// Notify appropriately with respect to the cURL response code
-		echo "$curlResponse-" . $this->curlResponseMessages[strval($curlResponse)] . "\n";
-		
+    
+    // If verbose mode is enabled, notify appropriately 
+    // with respect to the cURL response code
+    if ($this->isVerbose())
+    {
+      echo $this->getDescription()
+          . ": $curlResponse-" 
+          . $this->curlResponseMessages[strval($curlResponse)] 
+          . "\n";
+    }
+    
 		return ($curlResponse === 200 || $curlResponse === 201);
 	}
 	
@@ -100,5 +121,23 @@ class CurlWrapper
 	{
 		return $this->handle;
 	}
+  
+  /**
+   * Return the verbosity
+   * @return boolean 
+   */
+  public function isVerbose() {
+    return $this->verbose;
+  }
+
+  /**
+   * Return the cURL description text
+   * @return string
+   */
+  public function getDescription() {
+    return $this->description;
+  }
+
+
 }
 ?>

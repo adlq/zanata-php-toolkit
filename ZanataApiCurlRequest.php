@@ -47,9 +47,10 @@ class ZanataApiCurlRequest {
     {  
       // Build the cURL call
       $checkProjectCall = new CurlWrapper(
-          $this->getZanataApiUrl()->projectService(
-              $projectSlug), 
-          $this->getDefaultCurlOptions());
+          $this->getZanataApiUrl()->projectService($projectSlug), 
+          $this->getDefaultCurlOptions(),
+          true,
+          "Looking for project $projectSlug");
 
       // Execute it
       return ($checkProjectCall->fetch());
@@ -68,18 +69,15 @@ class ZanataApiCurlRequest {
    */
   public function getProjectIteration($projectSlug, $iterationSlug)
   {
-    if ($this->getProject($projectSlug))
+    if ($projectSlug !== '' && $iterationSlug !== '')
     {
-      if ($iterationSlug !== '')
-      {
-        $checkIterationCall = new CurlWrapper(
-          $this->getZanataApiUrl()->projectIterationService(
-            $projectSlug, 
-            $iterationSlug), 
-          $this->getDefaultCurlOptions());
-      
-        return ($checkIterationCall->fetch());
-      }
+      $checkIterationCall = new CurlWrapper(
+        $this->getZanataApiUrl()->projectIterationService($projectSlug, $iterationSlug), 
+        $this->getDefaultCurlOptions(),
+        true,
+        "Looking for iteration $iterationSlug of project $projectSlug");
+
+      return ($checkIterationCall->fetch());
     }
     return false;
   }
@@ -106,9 +104,10 @@ class ZanataApiCurlRequest {
 
     // Initialize the cURL handle with the right options
     $projectCreationCurl = new CurlWrapper(
-    $this->getZanataApiUrl()->projectService(
-      $projectSlug), 
-        $this->getPutOptions($projectCreationJson));
+        $this->getZanataApiUrl()->projectService($projectSlug), 
+        $this->getPutOptions($projectCreationJson),
+        true,
+        "Creating project $projectSlug");
 
     // Execute the cURL
     return $projectCreationCurl->fetch();
@@ -136,9 +135,10 @@ class ZanataApiCurlRequest {
     
     // Initialize the cURL handle with the right options
     $iterationCreationCurl = new CurlWrapper(
-    $this->getZanataApiUrl()->projectIterationService(
-      $projectSlug, $iterationSlug),
-        $this->getPutOptions($iterationCreationJson));
+        $this->getZanataApiUrl()->projectIterationService($projectSlug, $iterationSlug),
+        $this->getPutOptions($iterationCreationJson),
+        true,
+        "Creating iteration $iterationSlug for project $projectSlug");
 
     // Execute the cURL
     return $iterationCreationCurl->fetch();
@@ -202,9 +202,10 @@ class ZanataApiCurlRequest {
     
     // Initialize a cURL call with the right options
     $putSourceDocCall = new CurlWrapper(
-        $this->getZanataApiUrl()->sourceDocResourceService(
-            $projectSlug, $iterationSlug, $sourceDocName, true), 
-        $this->getPutOptions($putSourceDocJson));
+        $this->getZanataApiUrl()->sourceDocResourceService($projectSlug, $iterationSlug, $sourceDocName, true), 
+        $this->getPutOptions($putSourceDocJson),
+        true,
+        "Uploading source document $sourceDocName to project $projectSlug($iterationSlug)");
         
     // Execute it
     return $putSourceDocCall->fetch();
@@ -238,14 +239,14 @@ class ZanataApiCurlRequest {
 		
 		// Retrieve the existing translations
 		$retrieve = new CurlWrapper(
-				$this->getZanataApiUrl()->translatedDocResourceService(
-						$projectSlug, 
-						$iterationSlug, 
-						$sourceDocName,
-						$locale), $this->getDefaultCurlOptions());
-
+				$this->getZanataApiUrl()->translatedDocResourceService($projectSlug, $iterationSlug, $sourceDocName, $locale), 
+        $this->getDefaultCurlOptions(),
+        true,
+        "Retrieving translations for source document $sourceDocName in project $projectSlug($iterationSlug)");
+    $retrieveResult = $retrieve->fetch();
+    
 		// If the retrieval was successful
-		if ($retrieve != false)
+		if ($retrieveResult != false)
 		{
 			// Convert the JSON response to an associative array
 			$existingTranslations = json_decode($retrieve->fetch(), true);
@@ -321,12 +322,10 @@ class ZanataApiCurlRequest {
     
     // Initialize a cURL call with the right options
     $putTranslationsCurl = new CurlWrapper(
-        $this->getZanataApiUrl()->translatedDocResourceService(
-            $projectSlug, 
-						$iterationSlug, 
-						$sourceDocName,
-						$locale, 'import'), 
-        $this->getPutOptions($putTranslationsJson));
+        $this->getZanataApiUrl()->translatedDocResourceService($projectSlug, $iterationSlug, $sourceDocName, $locale, 'import'), 
+        $this->getPutOptions($putTranslationsJson),
+        true,
+        "Uploading translations for $sourceDocName to project $projectSlug($iterationSlug)");
         
     // Execute it
     return $putTranslationsCurl->fetch();

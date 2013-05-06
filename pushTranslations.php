@@ -2,12 +2,12 @@
 // Check that all required arguments were passed
 if (count($argv) < 3)
 {
-	echo 'Syntax is "php jam.php repoName sourceDocName poFilePath locale"' . "\n";
-	echo 'e.g. php jam.php elms.trunk elms.trunk /path/to/fr-FR.po fr-FR' . "\n";
+	echo 'Syntax is "php pushTranslations.php repoName sourceDocName poFilePath locale"' . "\n";
+	echo 'e.g. php pushTranslations.php elms.trunk elms.trunk /path/to/fr-FR.po fr-FR' . "\n";
 	exit("Missing parameters");
 }
 
-require_once('Toaster.php');
+require_once('ZanataToolkit.php');
 
 // Parse the ini file 
 $configs = parse_ini_file('config.ini', true);
@@ -36,9 +36,9 @@ else
 }
 
 // Update the source entries on Zanata!
-$toast = new Toaster($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl);
+$zanataToolkit = new ZanataToolkit($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl);
 
 // exit with the appropriate code
-exit($toast->pushTranslations($poFilePath, $sourceDocName, $locale));
+exit($zanataToolkit->pushTranslations($poFilePath, $sourceDocName, $locale));
 
 ?>

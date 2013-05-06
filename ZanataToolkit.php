@@ -5,18 +5,12 @@ require_once('ZanataApiCurlRequest.php');
 /**
  * Zanata Toolkit
  */
-class Toaster
+class ZanataToolkit
 {
 	// The project slug (ex: lms)
 	private $projectSlug;
 	// The iteration slug (ex: 1.0)
 	private $iterationSlug;
-	// Abosulte path to the resource (POT) file
-	private $resourceFilePath;
-	// The source locale
-	private $sourceLocale;
-	// The source document name (for Zanata)
-	private $sourceDocName;
   // cURL request crafter
   private $zanataCurlRequest;
 	

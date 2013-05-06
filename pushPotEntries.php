@@ -7,7 +7,7 @@ if (count($argv) < 3)
 	exit("Missing parameters");
 }
 
-require_once('Toaster.php');
+require_once('ZanataToolkit.php');
 
 // Parse the ini file 
 $configs = parse_ini_file('config.ini', true);
@@ -34,7 +34,7 @@ else
 }
 
 // Update the source entries on Zanata!
-$toast = new Toaster($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl);
+$zanataToolkit = new ZanataToolkit($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl);
 
-exit($toast->pushPotEntries($potFilePath, 'en-GB'));
+exit($zanataToolkit->pushPotEntries($potFilePath, 'en-GB'));
 ?>

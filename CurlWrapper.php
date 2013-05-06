@@ -8,6 +8,7 @@ class CurlWrapper
 	private $options;
 	private $handle;
 	private $curlResponseMessages = array(
+		'0' => 'Could not connect to server',
 		'201' => 'Document created',
 		'200' => 'Success',
 		'404' => 'Project or project iteration not found',

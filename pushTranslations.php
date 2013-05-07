@@ -7,7 +7,7 @@ if (count($argv) < 3)
 	exit("Missing parameters");
 }
 
-require_once('ZanataToolkit.php');
+require_once('ZanataPHPToolkit.php');
 
 // Parse the ini file 
 $configs = parse_ini_file('config.ini', true);

@@ -36,7 +36,7 @@ else
 }
 
 // Update the source entries on Zanata!
-$zanataToolkit = new ZanataToolkit($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl);
+$zanataToolkit = new ZanataPHPToolkit($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl);
 
 // exit with the appropriate code
 exit($zanataToolkit->pushTranslations($poFilePath, $sourceDocName, $locale));

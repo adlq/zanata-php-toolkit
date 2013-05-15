@@ -5,7 +5,7 @@ require_once('ZanataApiCurlRequest.php');
 /**
  * Zanata Toolkit
  */
-class ZanataToolkit
+class ZanataPHPToolkit
 {
 	// The project slug (ex: lms)
 	private $projectSlug;

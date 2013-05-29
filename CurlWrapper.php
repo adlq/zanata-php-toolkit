@@ -81,7 +81,6 @@ class CurlWrapper
 		// Retrieve the cURL response
 		$curlResponse = curl_getinfo($this->getHandle(), CURLINFO_HTTP_CODE);
 		
-    
     // If verbose mode is enabled, notify appropriately 
     // with respect to the cURL response code
     if ($this->isVerbose())

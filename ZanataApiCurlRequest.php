@@ -11,6 +11,7 @@ require_once('ZanataApiUrl.php');
 class ZanataApiCurlRequest {
   private $ZanataApiUrl;
   private $defaultCurlOptions;
+	private $isVerbose;
       
   /**
    * Constructor
@@ -18,13 +19,17 @@ class ZanataApiCurlRequest {
    * @param string $user The user
    * @param string $apiKey The API Key
    * @param string $baseUrl The base URL of the Zanata instance
+	 * @param boolean $verbose Verbosity
    */
-  function __construct($user, $apiKey, $baseUrl) {
+  function __construct($user, $apiKey, $baseUrl, $verbose = false) {
     $this->ZanataApiUrl = new ZanataApiUrl($baseUrl);
+		
+		$this->isVerbose = $verbose;
     
     // Define a generic options array for GET cURL calls
     $this->defaultCurlOptions = array(
 			CURLOPT_RETURNTRANSFER => true,
+			CURLINFO_HEADER_OUT => true,
 			CURLOPT_HTTPHEADER => array(
         'Content-type: application/json',
         'Accept: application/json', 
@@ -49,7 +54,7 @@ class ZanataApiCurlRequest {
       $checkProjectCall = new CurlWrapper(
           $this->getZanataApiUrl()->projectService($projectSlug), 
           $this->getDefaultCurlOptions(),
-          true,
+          $this->isVerbose,
           "Looking for project $projectSlug");
 
       // Execute it
@@ -74,7 +79,7 @@ class ZanataApiCurlRequest {
       $checkIterationCall = new CurlWrapper(
         $this->getZanataApiUrl()->projectIterationService($projectSlug, $iterationSlug), 
         $this->getDefaultCurlOptions(),
-        true,
+        $this->isVerbose,
         "Looking for iteration $iterationSlug of project $projectSlug");
 
       return ($checkIterationCall->fetch());
@@ -106,7 +111,7 @@ class ZanataApiCurlRequest {
     $projectCreationCurl = new CurlWrapper(
         $this->getZanataApiUrl()->projectService($projectSlug), 
         $this->getPutOptions($projectCreationJson),
-        true,
+        $this->isVerbose,
         "Creating project $projectSlug");
 
     // Execute the cURL
@@ -137,7 +142,7 @@ class ZanataApiCurlRequest {
     $iterationCreationCurl = new CurlWrapper(
         $this->getZanataApiUrl()->projectIterationService($projectSlug, $iterationSlug),
         $this->getPutOptions($iterationCreationJson),
-        true,
+        $this->isVerbose,
         "Creating iteration $iterationSlug for project $projectSlug");
 
     // Execute the cURL
@@ -204,7 +209,7 @@ class ZanataApiCurlRequest {
     $putSourceDocCall = new CurlWrapper(
         $this->getZanataApiUrl()->sourceDocResourceService($projectSlug, $iterationSlug, $sourceDocName, true), 
         $this->getPutOptions($putSourceDocJson),
-        true,
+        $this->isVerbose,
         "Uploading source document $sourceDocName to project $projectSlug($iterationSlug)");
         
     // Execute it
@@ -241,7 +246,7 @@ class ZanataApiCurlRequest {
 		$retrieve = new CurlWrapper(
 				$this->getZanataApiUrl()->translatedDocResourceService($projectSlug, $iterationSlug, $sourceDocName, $locale), 
         $this->getDefaultCurlOptions(),
-        true,
+        $this->isVerbose,
         "Retrieving translations for source document $sourceDocName in project $projectSlug($iterationSlug)");
     $retrieveResult = $retrieve->fetch();
     
@@ -324,11 +329,29 @@ class ZanataApiCurlRequest {
     $putTranslationsCurl = new CurlWrapper(
         $this->getZanataApiUrl()->translatedDocResourceService($projectSlug, $iterationSlug, $sourceDocName, $locale, 'import'), 
         $this->getPutOptions($putTranslationsJson),
-        true,
+        $this->isVerbose,
         "Uploading translations for $sourceDocName to project $projectSlug($iterationSlug)");
         
     // Execute it
     return $putTranslationsCurl->fetch();
+	}
+
+	/**
+	 * 
+	 * @param string $projectSlug
+	 * @param string $iterationSlug
+	 * @return mixed The cURL response
+	 */
+	public function getTranslationStats(
+			$projectSlug,
+			$iterationSlug)
+	{
+		$getTranslationStats = new CurlWrapper(
+				$this->getZanataApiUrl()->statisticsResource($projectSlug, $iterationSlug),
+				$this->getDefaultCurlOptions(),
+				$this->isVerbose);
+				
+		return $getTranslationStats->fetch();
 	}
 	
   /**

@@ -97,6 +97,25 @@ class ZanataApiUrl
 		
 		return $result;
 	}
+	
+	/**
+	 * Craft the URL corresponding to the StatisticsResource endpoint
+	 * @param string $projectSlug The project name
+	 * @param string $iterationSlug The project version
+	 * @param string $docName The document name (optional)
+	 * @return string The API URL
+	 */
+	public function statisticsResource(
+			$projectSlug,
+			$iterationSlug,
+			$docName = '')
+	{
+		$result = $this->getBaseUrl() . "/stats/proj/$projectSlug/iter/$iterationSlug";
+		if ($docName !== '')
+			$result .= "/doc/$docName";
+		
+		return $result;
+	}
 
 }
 ?>

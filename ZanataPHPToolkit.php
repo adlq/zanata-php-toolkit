@@ -28,13 +28,14 @@ class ZanataPHPToolkit
       $apiKey, 
       $projectSlug, 
       $iterationSlug, 
-      $baseUrl)
+      $baseUrl,
+			$verbose = false)
 	{
 		$this->projectSlug = $projectSlug;
 		$this->iterationSlug = $iterationSlug;
 		
 		$this->zanataCurlRequest = new ZanataApiCurlRequest(
-        $user, $apiKey, $baseUrl);
+        $user, $apiKey, $baseUrl, $verbose);
 		
 		// Check to see whether the given project exists
 		$projectExists = $this->getZanataCurlRequest()->getProject(
@@ -117,6 +118,33 @@ class ZanataPHPToolkit
         $this->getIterationSlug(),
         $sourceDocName, 
         $destLocale, $poEntries));
+	}
+	
+	public function getTranslationStats($destLocale = '')
+	{
+		$rawStats = $this->getZanataCurlRequest()->getTranslationStats(
+				$this->projectSlug, $this->iterationSlug);
+		
+		$stats = json_decode($rawStats);
+		
+		$result = array();
+		
+		foreach ($stats->stats as $stat)
+		{
+			$statsForLocale = array(
+				'total' => $stat->total,
+				'untranslated' => $stat->untranslated,
+				'needReview' => $stat->needReview,
+				'translated' => $stat->translated,
+				'lastTranslated' => $stat->lastTranslated
+			);
+			
+			$result[$stat->locale] = $statsForLocale;
+			if ($destLocale !== '' && $stat->locale === $destLocale)
+				return array($stat->locale => $statsForLocale);
+		}
+		
+		return $result;
 	}
 
 	/**

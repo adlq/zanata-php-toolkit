@@ -34,7 +34,7 @@ else
 }
 
 // Update the source entries on Zanata!
-$zanataToolkit = new ZanataPHPToolkit($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl);
+$zanataToolkit = new ZanataPHPToolkit($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl, true);
 
 exit($zanataToolkit->pushPotEntries($potFilePath, 'en-GB'));
 ?>

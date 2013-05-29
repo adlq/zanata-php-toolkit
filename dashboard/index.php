@@ -6,10 +6,10 @@
 </head>
 <body>
 <?php
-require_once('ZanataPHPToolkit.php');
+require_once('../ZanataPHPToolkit.php');
 
 // Parse the ini file 
-$configs = parse_ini_file('config.ini', true);
+$configs = parse_ini_file('../config.ini', true);
 
 $zanataUrl = $configs['Zanata']['url'];
 $user = $configs['Zanata']['user'];

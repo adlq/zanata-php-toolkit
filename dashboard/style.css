@@ -1,0 +1,67 @@
+body 
+{ 
+	font-family: Arial; 
+}
+.row 
+{
+	border: 1px solid #000; 
+	padding: 10px; 
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+	display: inline-block;
+}
+
+h1 
+{ 
+	background: #34495e; 
+	color: #ecf0f1; 
+	font-weight: bold; 
+	padding: 10px;
+	margin-bottom: 3px;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+	border-bottom: 5px solid #000;
+}
+
+.untranslated, .translated, .needReview
+{
+	height: 20px;
+	float: left;
+	display: block;
+}
+
+.untranslated
+{
+	background: #e74c3c; 
+}
+
+.translated 
+{
+	background: #27ae60;
+}
+
+.needReview
+{
+	background: #f39c12;
+}
+
+.translatedText
+{
+	color: #27ae60;
+}
+
+.needReviewText
+{
+	color: #f39c12;;
+}
+
+.untranslatedText
+{
+	color: #e74c3c;
+}
+
+.totalText, .translatedText, .untranslatedText, .needReviewText
+{
+	font-weight: bold;
+}
+

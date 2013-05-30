@@ -52,17 +52,17 @@ ECHO;
 				$untranslated = $stat['untranslated'];
 				
 				// Compute progress bar stuff
-				$totalSize = 300;
+				$totalSize = 70;
 				$translatedSize = $translated * $totalSize / $total;
 				$needReviewSize = $needReview * $totalSize / $total;
 				$untranslatedSize = $untranslated * $totalSize / $total;
 				
 				echo <<<ECHO
-				<div class="row">
+<div class="row">
 					<h3>$locale</h3>
-					<div class="translated" style="width:{$translatedSize}px"></div>
-					<div class="needReview" style="width:{$needReviewSize}px"></div>
-					<div class="untranslated" style="width:{$untranslatedSize}px"></div>
+					<div class="translated" style="width:{$translatedSize}%"></div>
+					<div class="needReview" style="width:{$needReviewSize}%"></div>
+					<div class="untranslated" style="width:{$untranslatedSize}%"></div>
 					<br><br>
 					<ul>
 						<li>Translated: <span class="translatedText">$translated</span></li>

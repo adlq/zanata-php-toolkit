@@ -5,11 +5,17 @@ body
 
 .row 
 {
-	border: 1px solid #000; 
-	padding: 10px; 
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-	display: inline-block;
+  height: 250px;
+  width: 24%;
+  border: 1px solid #000; 
+  padding: 2%;
+  margin: 0.5%;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  display: inline-block;
+  vertical-align: top;
+  word-wrap: break-word;
+  box-sizing: border-box;
 }
 
 .topRow
@@ -18,16 +24,16 @@ body
 	padding: 10px; 
 	-moz-border-radius: 5px;
 	border-radius: 5px;
-  margin-bottom: 3px;
+  margin: 0.5%;
 }
 
 h1 
 { 
+  margin: 1% 0.5%;
 	background: #34495e; 
 	color: #ecf0f1; 
 	font-weight: bold; 
 	padding: 10px;
-	margin-bottom: 3px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 	border-bottom: 5px solid #000;
@@ -75,3 +81,7 @@ h1
 	font-weight: bold;
 }
 
+ul
+{
+	padding-left: 0;
+}

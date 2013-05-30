@@ -57,9 +57,12 @@ ECHO;
 				$needReviewSize = $needReview * $totalSize / $total;
 				$untranslatedSize = $untranslated * $totalSize / $total;
 				
+				// Flag
+				$flagName = strtolower(substr($locale, 0, 2));
+				
 				echo <<<ECHO
 <div class="row">
-					<h3>$locale</h3>
+					<h3>$locale <img src="flags/$flagName.gif"/></h3>
 					<div class="translated" style="width:{$translatedSize}%"></div>
 					<div class="needReview" style="width:{$needReviewSize}%"></div>
 					<div class="untranslated" style="width:{$untranslatedSize}%"></div>

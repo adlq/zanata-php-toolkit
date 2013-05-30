@@ -116,6 +116,28 @@ class ZanataApiUrl
 		
 		return $result;
 	}
-
+	
+	/**
+	 * Craft the URL corresponding to the FileService endpoint
+	 * @param string $projectSlug The project id
+	 * @param string $iterationSlug The project version 
+	 * @param string $type The fily type (po, pot)
+	 * @param string $docId The source document id
+	 * @param string $locale The target locale (optionnal)
+	 * @return string The API URL
+	 */
+	public function fileService(
+			$projectSlug,
+			$iterationSlug,
+			$type,
+			$docName,
+			$locale = '')
+	{
+		if ($locale === '')
+			$result = $this->getBaseUrl() . "/file/source/$projectSlug/$iterationSlug/$type?docId=$docName";
+		else
+			$result = $this->getBaseUrl() . "/file/translation/$projectSlug/$iterationSlug/$locale/po?docId=$docName";
+		return $result;
+	}
 }
 ?>

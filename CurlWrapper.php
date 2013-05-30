@@ -48,6 +48,15 @@ class CurlWrapper
 	}
 	
 	/**
+	 * Close the cURL if the handle is of valid format
+	 */
+	public function __destruct()
+	{
+    if(gettype($this->getHandle()) == 'resource') 
+			curl_close($this->getHandle());
+	}
+	
+	/**
 	 * Execute the cURL call
 	 * @return mixed	cURL response if the cURL call was successful, False otherwise
 	 */
@@ -59,10 +68,7 @@ class CurlWrapper
     
 		// Report the outcome to the user
 		$result = $this->reportOutcome();
-		
-		// Close the cURL handle
-		curl_close($this->getHandle());
-    
+
 		if ($result)
 		{
 			return $finalResponse;
@@ -85,9 +91,15 @@ class CurlWrapper
     // with respect to the cURL response code
     if ($this->isVerbose())
     {
+			// Default message
+			$msg = 'Unknown HTTP response';
+			
+			if (isset($this->curlResponseMessages[strval($curlResponse)]))
+				$msg = $this->curlResponseMessages[strval($curlResponse)];
+			
       echo $this->getDescription()
           . ": $curlResponse-" 
-          . $this->curlResponseMessages[strval($curlResponse)] 
+          . $msg
           . "\n";
     }
     

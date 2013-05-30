@@ -25,7 +25,12 @@ foreach ($configs as $key => $config)
 		$zanataToolkit = new ZanataPHPToolkit($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl);
 		
 		// Retrieve project name
-		$projectName = json_decode($zanataToolkit->getZanataCurlRequest()->getProject($projectSlug))->name;
+		$rawStats = json_decode($zanataToolkit->getZanataCurlRequest()->getProject($projectSlug));
+		
+		if (empty($rawStats))
+			exit(1);
+		
+		$projectName = $rawStats->name;
 		
 		echo "<h1>$projectName - $iterationSlug</h1>";
 		
@@ -33,15 +38,21 @@ foreach ($configs as $key => $config)
 		
 		if (!empty($stats))
 		{
+			$total = $stats[key($stats)]['total'];
+			echo <<<ECHO
+			<div class="topRow">
+			Total number of strings: <span class="totalText">$total</span>
+			</div>
+ECHO;
+			
 			foreach ($stats as $locale => $stat)
 			{
-				$total = $stat['total'];
 				$translated = $stat['translated'];
 				$needReview = $stat['needReview'];
 				$untranslated = $stat['untranslated'];
 				
 				// Compute progress bar stuff
-				$totalSize = 100;
+				$totalSize = 300;
 				$translatedSize = $translated * $totalSize / $total;
 				$needReviewSize = $needReview * $totalSize / $total;
 				$untranslatedSize = $untranslated * $totalSize / $total;
@@ -54,7 +65,6 @@ foreach ($configs as $key => $config)
 					<div class="untranslated" style="width:{$untranslatedSize}px"></div>
 					<br><br>
 					<ul>
-						<li>Total: <span class="totalText">$total</span></li>
 						<li>Translated: <span class="translatedText">$translated</span></li>
 						<li>Need review: <span class="needReviewText">$needReview</span></li>
 						<li>Untranslated: <span class="untranslatedText">$untranslated</span></li>

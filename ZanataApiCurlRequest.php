@@ -256,22 +256,25 @@ class ZanataApiCurlRequest {
 			// Convert the JSON response to an associative array
 			$existingTranslations = json_decode($retrieve->fetch(), true);
 			
-			// Push the existing translations onto the text flow targets array
-			foreach($existingTranslations['textFlowTargets'] as $tfTarget)
+			if (!empty($existingTranslations))
 			{
-				// So we don't lose any old translations 
-				array_push($textFlowTargets, array(
-					'resId' => $tfTarget['resId'],
-					'state' => $tfTarget['state'],
-					'content' => $tfTarget['content'],
-					'extensions' => array(),
-					'revision' => $tfTarget['revision'],
-					'textFlowRevision' => $tfTarget['textFlowRevision']
-					));
+				// Push the existing translations onto the text flow targets array
+				foreach($existingTranslations['textFlowTargets'] as $tfTarget)
+				{
+					// So we don't lose any old translations 
+					array_push($textFlowTargets, array(
+						'resId' => $tfTarget['resId'],
+						'state' => $tfTarget['state'],
+						'content' => $tfTarget['content'],
+						'extensions' => array(),
+						'revision' => $tfTarget['revision'],
+						'textFlowRevision' => $tfTarget['textFlowRevision']
+						));
 
-				// Update the second array, that will help to quickly target 
-				// a specific entry in the first array using only its resId
-				$textFlowTargetIds[$tfTarget['resId']] = key($textFlowTargets);
+					// Update the second array, that will help to quickly target 
+					// a specific entry in the first array using only its resId
+					$textFlowTargetIds[$tfTarget['resId']] = key($textFlowTargets);
+				}
 			}
 		}
 	

@@ -120,6 +120,12 @@ class ZanataPHPToolkit
         $destLocale, $poEntries));
 	}
 	
+	/**
+	 * Retrieve translation stats for a specific locale
+	 * 
+	 * @param string $destLocale The target locale
+	 * @return array Empty array 
+	 */
 	public function getTranslationStats($destLocale = '')
 	{
 		$rawStats = $this->getZanataCurlRequest()->getTranslationStats(
@@ -128,6 +134,10 @@ class ZanataPHPToolkit
 		$stats = json_decode($rawStats);
 		
 		$result = array();
+		
+		// Return empty array if nothing is found
+		if (empty($stats))
+			return $result;
 		
 		foreach ($stats->stats as $stat)
 		{

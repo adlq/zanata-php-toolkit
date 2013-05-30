@@ -2,13 +2,23 @@ body
 { 
 	font-family: Arial; 
 }
+
 .row 
 {
 	border: 1px solid #000; 
 	padding: 10px; 
-	-moz-border-radius: 15px;
-	border-radius: 15px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
 	display: inline-block;
+}
+
+.topRow
+{
+  border: 1px solid #000; 
+	padding: 10px; 
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+  margin-bottom: 3px;
 }
 
 h1 
@@ -18,8 +28,8 @@ h1
 	font-weight: bold; 
 	padding: 10px;
 	margin-bottom: 3px;
-	-moz-border-radius: 15px;
-	border-radius: 15px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
 	border-bottom: 5px solid #000;
 }
 

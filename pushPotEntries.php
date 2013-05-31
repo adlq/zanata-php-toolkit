@@ -7,14 +7,12 @@ if (count($argv) < 3)
 	exit("Missing parameters");
 }
 
+require_once('conf.php');
 require_once('ZanataPHPToolkit.php');
 
-// Parse the ini file 
-$configs = parse_ini_file('config.ini', true);
-
-$zanataUrl = $configs['Zanata']['url'];
-$user = $configs['Zanata']['user'];
-$apiKey = $configs['Zanata']['api_key'];
+$zanataUrl = $ZANATA['conf']['zanata']['url'];
+$user = $ZANATA['conf']['zanata']['user'];
+$apiKey = $ZANATA['conf']['zanata']['apiKey'];
 $projectSlug = '';
 $iterationSlug = '';
 
@@ -23,14 +21,14 @@ $repoName = $argv[1];
 $potFilePath = $argv[2];
 
 // Attempt to find the repo name in the config.ini file
-if (isset($configs[$repoName]))
+if (isset($ZANATA['conf']['repos'][$repoName]))
 {
-	$projectSlug = $configs[$repoName]['project_slug'];
-	$iterationSlug = $configs[$repoName]['iteration_slug'];
+	$projectSlug = $ZANATA['conf']['repos'][$repoName]['projectSlug'];
+	$iterationSlug = $ZANATA['conf']['repos'][$repoName]['iterationSlug'];
 }
 else
 {
-	exit('Unknown project, no section $repoName in config.ini file');
+	exit('Unknown project, no section $repoName in conf.php file');
 }
 
 // Update the source entries on Zanata!

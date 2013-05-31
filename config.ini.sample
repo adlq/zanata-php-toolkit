@@ -1,9 +1,0 @@
-; Config file to interact with Zanata
-[Zanata]
-url=https://translate.zanata.org/zanata
-user=dnghia
-api_key=1d8adf3268fab3b2eaf713fc0148c0c5
-
-[elms.trunk]
-project_slug=lms
-iteration_slug=13.1

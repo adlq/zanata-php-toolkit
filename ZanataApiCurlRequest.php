@@ -1,6 +1,7 @@
 <?php
 require_once('CurlWrapper.php');
 require_once('ZanataApiUrl.php');
+define('CRITICAL_SIZE', 1000);
 
 /**
  * This class represents a cURL request that can be sent to 
@@ -30,6 +31,7 @@ class ZanataApiCurlRequest {
     $this->defaultCurlOptions = array(
 			CURLOPT_RETURNTRANSFER => true,
 			CURLINFO_HEADER_OUT => true,
+			CURLOPT_TIMEOUT => 0,
 			CURLOPT_HTTPHEADER => array(
         'Content-type: application/json',
         'Accept: application/json', 
@@ -169,51 +171,77 @@ class ZanataApiCurlRequest {
       $sourceLocale,
       $entries)
   {
-    // Contains the textFlows that will be sent to Zanata's API
-    $textFlows = array();
-    // Unique ID for each entry
-    $stringId = '';
-    
-    // Gather textFlows from the entries array
-		foreach($entries as $entry) 
+		// This array keeps track of the entries hashes.
+		// That way we don't include duplicate strings in the request
+		// which will trigger an internal server error
+		$hashArray = array();
+		
+		if (count($entries) > CRITICAL_SIZE)
 		{
-			// If the entry's msgid is not empty...
-			if($entry->getSource() !== '')
+			// Slice the entries into blocks of 100
+			$chunks = array_chunk($entries, CRITICAL_SIZE);
+			
+			$accChunk = array();
+			$results = array();
+			
+			foreach($chunks as $id => $chunk)
 			{
-				// Hash the context and the msgid, 
-        // to make sure that the id is unique
-				$stringId = hash(
-            'sha256', 
-            $entry->getContext() . $entry->getSource());
+				echo "Processing chunk #$id...\n";
+				
+				// Accumulate pot entries
+				$accChunk = array_merge($accChunk, $chunk);
 
-				// Push to the textFlows array
-        array_push($textFlows, array(
-          'id' => $stringId,
-          'lang' => $sourceLocale,
-          'content' => $entry->getSource(),
-          'extensions' => array(array(
-            'object-type' => 'pot-entry-header', 
-            'context' => $entry->getContext()))));
+				// Contains the textFlows that will be sent to Zanata's API
+				$textFlows = array();
+
+				// Gather textFlows from the entries array
+				foreach($accChunk as $entry) 
+				{
+					$entryHash = $entry->getHash();
+
+					// If the entry's msgid is not empty...
+					if(!in_array($entryHash, $hashArray) && $entry->getSource() !== '')
+					{
+						// Push to the textFlows array
+						array_push($textFlows, array(
+							'id' => $entry->getHash(),
+							'lang' => $sourceLocale,
+							'content' => $entry->getSource(),
+							'extensions' => array(array(
+								'object-type' => 'pot-entry-header', 
+								'context' => $entry->getContext()))));
+						// Update the hash array
+						array_push($hashArray, $entryHash);
+					}
+				}
+
+				// Build a JSON object containing all the entries
+				$putSourceDocJson = json_encode(array(   
+					'name' => $sourceDocName,
+					'lang' => $sourceLocale,
+					'contentType' => 'application/x-gettext',
+					'textFlows' => $textFlows
+					));
+
+				// Initialize a cURL call with the right options
+				$putSourceDocCall = new CurlWrapper(
+						$this->getZanataApiUrl()->sourceDocResourceService($projectSlug, $iterationSlug, $sourceDocName, true), 
+						$this->getPutOptions($putSourceDocJson),
+						$this->isVerbose,
+						"Uploading source document $sourceDocName to project $projectSlug($iterationSlug)");
+
+				// Execute it
+				array_push($results, $putSourceDocCall->fetch());
 			}
 		}
 		
-		// Build a JSON object containing all the entries
-		$putSourceDocJson = json_encode(array(   
-			'name' => $sourceDocName,
-			'lang' => $sourceLocale,
-			'contentType' => 'application/x-gettext',
-			'textFlows' => $textFlows
-			));    
-    
-    // Initialize a cURL call with the right options
-    $putSourceDocCall = new CurlWrapper(
-        $this->getZanataApiUrl()->sourceDocResourceService($projectSlug, $iterationSlug, $sourceDocName, true), 
-        $this->getPutOptions($putSourceDocJson),
-        $this->isVerbose,
-        "Uploading source document $sourceDocName to project $projectSlug($iterationSlug)");
-        
-    // Execute it
-    return $putSourceDocCall->fetch();
+		foreach($results as $result)
+		{
+			if ($result === false)
+				return false;
+		}
+		
+		return $result[count($result) - 1];
   }
   
   /**

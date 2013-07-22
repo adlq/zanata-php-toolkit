@@ -21,6 +21,8 @@ class CurlWrapper
 		'500' => 'Internal server error');
   // Boolean indicating verbose mode or not
   private $verbose;
+  // Boolean indicating debug mode or not
+	private $debug;
   // String describing the purpose of the cURL call
   private $description;
 
@@ -40,6 +42,7 @@ class CurlWrapper
 		if ($url !== '')
 		{
       $this->verbose = $verbose;
+      $this->debug= $debug;
       $this->description = $description;
 			// Initialize the cURL handle with the crafted API URL
 			$this->handle = curl_init($url);
@@ -57,9 +60,16 @@ class CurlWrapper
 		}
 	}
 
+	/**
+	 * Callback function for CURLOPT_PROGRESSFUNCTION
+	 *
+	 * @param int $download_size Total download size
+	 * @param int $downloaded_size Current download size
+	 * @param int $upload_size Total updoad size
+	 * @param int $uploaded_size Current upload size
+	 */
 	function progressCallback($download_size, $downloaded_size, $upload_size, $uploaded_size)
 	{
-    static $previousProgress = 0;
 
     if ($download_size == 0 && $upload_size == 0)
         $progress = 0;
@@ -69,13 +79,7 @@ class CurlWrapper
         $progress = round($uploaded_size * 100 / $upload_size);
 
     $timestamp = time();
-    echo "$download_size, $downloaded_size, $upload_size, $uploaded_size => $progress @ $timestamp\n";
-
-    if ($progress > $previousProgress)
-    {
-        $previousProgress = $progress;
-        echo "{$this->description}...$progress\n";
-    }
+    echo "Progress at $timestamp: $progress %\n";
 	}
 
 	/**
@@ -118,12 +122,15 @@ class CurlWrapper
 		// Retrieve the cURL response
 		$curlResponse = curl_getinfo($this->getHandle(), CURLINFO_HTTP_CODE);
 
-		$data = curl_getinfo($this->getHandle());
-		print_r($data);
+		if ($this->debug)
+		{
+			$data = curl_getinfo($this->getHandle());
+			print_r($data);
+		}
 
     // If verbose mode is enabled, notify appropriately
     // with respect to the cURL response code
-    if ($this->isVerbose())
+    if ($this->verbose)
     {
 			// Default message
 			$msg = 'Unknown HTTP response';
@@ -166,14 +173,6 @@ class CurlWrapper
 	{
 		return $this->handle;
 	}
-
-  /**
-   * Return the verbosity
-   * @return boolean
-   */
-  public function isVerbose() {
-    return $this->verbose;
-  }
 
   /**
    * Return the cURL description text

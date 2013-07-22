@@ -53,7 +53,7 @@ class CurlWrapper
 	{
     static $previousProgress = 0;
 
-    if ($download_size == 0 || $upload_size == 0)
+    if ($download_size == 0 && $upload_size == 0)
         $progress = 0;
     else if ($download_size != 0)
         $progress = round($downloaded_size * 100 / $download_size);
@@ -109,6 +109,9 @@ class CurlWrapper
 	{
 		// Retrieve the cURL response
 		$curlResponse = curl_getinfo($this->getHandle(), CURLINFO_HTTP_CODE);
+
+		$data = curl_getinfo($this->getHandle());
+		print_r($data);
 
     // If verbose mode is enabled, notify appropriately
     // with respect to the cURL response code

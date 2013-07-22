@@ -23,14 +23,14 @@ class CurlWrapper
   private $verbose;
   // String describing the purpose of the cURL call
   private $description;
-	
+
 	/**
 	 * Constructor
 	 * @param string	$url The cURL URL
 	 * @param array		$options The cURL options
    * @param boolean $verbose True to enable verbose mode
 	 */
-	public function __construct($url, $options, 
+	public function __construct($url, $options,
       $verbose = false,
       $description = '')
 	{
@@ -44,18 +44,41 @@ class CurlWrapper
 			// Set cURL options
 			$this->options = $options;
 			curl_setopt_array($this->getHandle(), $this->getOptions());
+			curl_setopt($this->getHandle(), CURLOPT_NOPROGRESS, false);
+			curl_setopt($this->getHandle(), CURLOPT_PROGRESSFUNCTION, array('CurlWrapper', 'progressCallback'));
 		}
 	}
-	
+
+	function progressCallback($download_size, $downloaded_size, $upload_size, $uploaded_size)
+	{
+    static $previousProgress = 0;
+
+    if ($download_size == 0 || $upload_size == 0)
+        $progress = 0;
+    else if ($download_size != 0)
+        $progress = round($downloaded_size * 100 / $download_size);
+    else
+        $progress = round($uploaded_size * 100 / $upload_size);
+
+    $timestamp = time();
+    echo "$download_size, $downloaded_size, $upload_size, $uploaded_size => $progress @ $timestamp\n";
+
+    if ($progress > $previousProgress)
+    {
+        $previousProgress = $progress;
+        echo "{$this->description}...$progress\n";
+    }
+	}
+
 	/**
 	 * Close the cURL if the handle is of valid format
 	 */
 	public function __destruct()
 	{
-    if(gettype($this->getHandle()) == 'resource') 
+    if(gettype($this->getHandle()) == 'resource')
 			curl_close($this->getHandle());
 	}
-	
+
 	/**
 	 * Execute the cURL call
 	 * @return mixed	cURL response if the cURL call was successful, False otherwise
@@ -65,7 +88,7 @@ class CurlWrapper
 		// Execute the cURL call
 		$response = curl_exec($this->getHandle());
     $finalResponse = $response === '' ? true : $response;
-    
+
 		// Report the outcome to the user
 		$result = $this->reportOutcome();
 
@@ -75,40 +98,40 @@ class CurlWrapper
 		}
 		return $result;
 	}
-	
+
   /**
    * Given the HTTP response code,
    * Notify the user of the cURL outcome with the appropriate message
-   * 
+   *
 	 * @return boolean	True if the cURL call was successful, False otherwise
 	 */
 	public function reportOutcome()
 	{
 		// Retrieve the cURL response
 		$curlResponse = curl_getinfo($this->getHandle(), CURLINFO_HTTP_CODE);
-		
-    // If verbose mode is enabled, notify appropriately 
+
+    // If verbose mode is enabled, notify appropriately
     // with respect to the cURL response code
     if ($this->isVerbose())
     {
 			// Default message
 			$msg = 'Unknown HTTP response';
-			
+
 			if (isset($this->curlResponseMessages[strval($curlResponse)]))
 				$msg = $this->curlResponseMessages[strval($curlResponse)];
-			
+
       echo $this->getDescription()
-          . ": $curlResponse-" 
+          . ": $curlResponse-"
           . $msg
           . "\n";
     }
-    
+
 		return ($curlResponse === 200 || $curlResponse === 201);
 	}
-	
+
 	/**
 	 * Return the url
-	 * @return string	
+	 * @return string
 	 */
 	public function getUrl()
 	{
@@ -132,10 +155,10 @@ class CurlWrapper
 	{
 		return $this->handle;
 	}
-  
+
   /**
    * Return the verbosity
-   * @return boolean 
+   * @return boolean
    */
   public function isVerbose() {
     return $this->verbose;

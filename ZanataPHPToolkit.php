@@ -14,47 +14,47 @@ class ZanataPHPToolkit
 	private $iterationSlug;
   // cURL request crafter
   private $zanataCurlRequest;
-	
+
 	/**
 	 * Constructor
    * @param string $user        The user
 	 * @param string $apiKey			The API key
 	 * @param string $projectSlug		The project slug (short name)
 	 * @param string $iterationSlug		The project version
-	 * @param string $zanataHost		URL where the Zanata instance 
+	 * @param string $zanataHost		URL where the Zanata instance
    *                              is hosted, must not end with '/'
 	 */
 	public function __construct(
-      $user, 
-      $apiKey, 
-      $projectSlug, 
-      $iterationSlug, 
+      $user,
+      $apiKey,
+      $projectSlug,
+      $iterationSlug,
       $baseUrl,
 			$verbose = false)
 	{
 		$this->projectSlug = $projectSlug;
 		$this->iterationSlug = $iterationSlug;
-		
+
 		$this->zanataCurlRequest = new ZanataApiCurlRequest(
         $user, $apiKey, $baseUrl, $verbose);
-		
+
 		// Check to see whether the given project exists
 		$projectExists = $this->getZanataCurlRequest()->getProject(
         $this->getProjectSlug());
-    
+
 		if(!$projectExists)
 		{
 			// The project does not exist, we have to create it first
       $this->getZanataCurlRequest()->putProject($this->getProjectSlug());
     }
-		
+
     // Now the project exists
     // Check whether the iteration exists
-    $iterationExists = 
+    $iterationExists =
         $this->getZanataCurlRequest()->getProjectIteration(
             $this->projectSlug, $this->getIterationSlug());
-    
-    if (!$projectExists || !$iterationExists) 
+
+    if (!$projectExists || !$iterationExists)
     {
       // If the project didn't exist in the first place, we have
       // to create the iteration anyway
@@ -63,23 +63,23 @@ class ZanataPHPToolkit
     }
 
 	}
-	
+
 	/**
-	 * Push the source POT entries to Zanata, 
+	 * Push the source POT entries to Zanata,
    * creating the project/project version if necessary
-	 * 
+	 *
 	 * @param string $resourceFilePath Full path to the POT file
 	 * @param string $sourceLocale The source locale
 	 * @return	boolean	  False if the push has succeeded, True otherwise
 	 *			(hook exit code)
 	 */
-	public function pushPotEntries($resourceFilePath, $sourceLocale) 
+	public function pushPotEntries($resourceFilePath, $sourceLocale)
 	{
 		// Extract the source document name from the absolute path
 		$basename = basename($resourceFilePath);
 		$sourceDocName = pathinfo($basename, PATHINFO_FILENAME);
-		
-		
+
+
     // Parse the resource (POT) file
     $potFile = new POFile($resourceFilePath);
 
@@ -88,26 +88,26 @@ class ZanataPHPToolkit
 
     // Send the entries to Zanata
     return !($this->getZanataCurlRequest()->putSourceDoc(
-        $this->getProjectSlug(), 
+        $this->getProjectSlug(),
         $this->getIterationSlug(),
-        $sourceDocName, 
+        $sourceDocName,
         $sourceLocale, $potEntries));
 	}
-	
+
 	/**
 	 * Push a set of translations from a PO file to the Zanata platform
 	 * @param string $resourceFilePath Absolute path to the PO file
-	 * @param string $sourceDocName Name of the source document on Zanata 
+	 * @param string $sourceDocName Name of the source document on Zanata
 	 * @param string $destLocale Name of the target locale
 	 * @return boolean False if the push has succeeded, True otherwise
 	 *			(hook exit code)
 	 */
 	public function pushTranslations(
-			$resourceFilePath, 
+			$resourceFilePath,
 			$sourceDocName,
 			$destLocale)
 	{
-    // Parse the resource (POT) file
+    // Parse the resource (PO) file
     $poFile = new POFile($resourceFilePath);
 
     // Retrieve its entries
@@ -115,31 +115,31 @@ class ZanataPHPToolkit
 
     // Send the entries to Zanata
     return !($this->getZanataCurlRequest()->putTranslations(
-        $this->getProjectSlug(), 
+        $this->getProjectSlug(),
         $this->getIterationSlug(),
-        $sourceDocName, 
+        $sourceDocName,
         $destLocale, $poEntries));
 	}
-	
+
 	/**
 	 * Retrieve translation stats for a specific locale
-	 * 
+	 *
 	 * @param string $destLocale The target locale
-	 * @return array Empty array 
+	 * @return array Empty array
 	 */
 	public function getTranslationStats($destLocale = '')
 	{
 		$rawStats = $this->getZanataCurlRequest()->getTranslationStats(
 				$this->projectSlug, $this->iterationSlug);
-		
+
 		$stats = json_decode($rawStats);
-		
+
 		$result = array();
-		
+
 		// Return empty array if nothing is found
 		if (empty($stats))
 			return $result;
-		
+
 		foreach ($stats->stats as $stat)
 		{
 			$statsForLocale = array(
@@ -149,18 +149,18 @@ class ZanataPHPToolkit
 				'translated' => $stat->translated,
 				'lastTranslated' => $stat->lastTranslated
 			);
-			
+
 			$result[$stat->locale] = $statsForLocale;
 			if ($destLocale !== '' && $stat->locale === $destLocale)
 				return array($stat->locale => $statsForLocale);
 		}
-		
+
 		return $result;
 	}
 
 	/**
 	 * Return the project slug
-	 * @return string 
+	 * @return string
 	 */
 	public function getProjectSlug()
 	{
@@ -175,7 +175,7 @@ class ZanataPHPToolkit
 	{
 		return $this->iterationSlug;
 	}
-  
+
   /**
    * Return the curl crafter
    * @return ZanataApiCurlRequest

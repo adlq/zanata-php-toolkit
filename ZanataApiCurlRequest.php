@@ -13,6 +13,7 @@ class ZanataApiCurlRequest {
   private $ZanataApiUrl;
   private $defaultCurlOptions;
 	private $isVerbose;
+	private $isInDebug;
 
   /**
    * Constructor
@@ -22,10 +23,11 @@ class ZanataApiCurlRequest {
    * @param string $baseUrl The base URL of the Zanata instance
 	 * @param boolean $verbose Verbosity
    */
-  function __construct($user, $apiKey, $baseUrl, $verbose = false) {
+  function __construct($user, $apiKey, $baseUrl, $verbose = false, $debug = false) {
     $this->ZanataApiUrl = new ZanataApiUrl($baseUrl);
 
 		$this->isVerbose = $verbose;
+		$this->isInDebug = $debug;
 
     // Define a generic options array for GET cURL calls
     $this->defaultCurlOptions = array(
@@ -57,6 +59,7 @@ class ZanataApiCurlRequest {
           $this->getZanataApiUrl()->projectService($projectSlug),
           $this->getDefaultCurlOptions(),
           $this->isVerbose,
+          $this->isInDebug,
           "Looking for project $projectSlug");
 
       // Execute it
@@ -82,6 +85,7 @@ class ZanataApiCurlRequest {
         $this->getZanataApiUrl()->projectIterationService($projectSlug, $iterationSlug),
         $this->getDefaultCurlOptions(),
         $this->isVerbose,
+        $this->isInDebug,
         "Looking for iteration $iterationSlug of project $projectSlug");
 
       return ($checkIterationCall->fetch());
@@ -114,6 +118,7 @@ class ZanataApiCurlRequest {
         $this->getZanataApiUrl()->projectService($projectSlug),
         $this->getPutOptions($projectCreationJson),
         $this->isVerbose,
+        $this->isInDebug,
         "Creating project $projectSlug");
 
     // Execute the cURL
@@ -145,6 +150,7 @@ class ZanataApiCurlRequest {
         $this->getZanataApiUrl()->projectIterationService($projectSlug, $iterationSlug),
         $this->getPutOptions($iterationCreationJson),
         $this->isVerbose,
+        $this->isInDebug,
         "Creating iteration $iterationSlug for project $projectSlug");
 
     // Execute the cURL
@@ -233,6 +239,7 @@ class ZanataApiCurlRequest {
 					$this->getZanataApiUrl()->sourceDocResourceService($projectSlug, $iterationSlug, $sourceDocName, true),
 					$this->getPutOptions($putSourceDocJson),
 					$this->isVerbose,
+					$this->isInDebug,
 					"Uploading source document $sourceDocName to project $projectSlug($iterationSlug)");
 
 			// Execute it
@@ -279,7 +286,11 @@ class ZanataApiCurlRequest {
 				$this->getZanataApiUrl()->translatedDocResourceService($projectSlug, $iterationSlug, $sourceDocName, $locale),
         $this->getDefaultCurlOptions(),
         $this->isVerbose,
+        $this->isInDebug,
         "Retrieving translations for source document $sourceDocName in project $projectSlug($iterationSlug)");
+
+		echo "Retrieving and adapting existing translations...";
+
     $retrieveResult = $retrieve->fetch();
 
 		// If the retrieval was successful
@@ -293,7 +304,6 @@ class ZanataApiCurlRequest {
 				// Push the existing translations onto the text flow targets array
 				foreach($existingTranslations['textFlowTargets'] as $tfTarget)
 				{
-					//echo "Adapting {$tfTarget['content']}...";
 					// So we don't lose any old translations
 					array_push($textFlowTargets, array(
 						'resId' => $tfTarget['resId'],
@@ -307,12 +317,13 @@ class ZanataApiCurlRequest {
 					// Update the second array, that will help to quickly target
 					// a specific entry in the first array using only its resId
 					$textFlowTargetIds[$tfTarget['resId']] = key($textFlowTargets);
-					//echo "Done\n";
 				}
 			}
 		}
 
-		echo "Done retrieving and adapting existing translations\n";
+		echo "Done\n";
+
+		echo "Preparing all entries...";
 
 		// Loop over all the PO entries obtained by parsing the file
 		foreach($entries as $entry)
@@ -326,7 +337,6 @@ class ZanataApiCurlRequest {
 			// Only process if the entry has a non-empty msgid and msgstr
 			if($source !== '' && $target !== '')
 			{
-				//echo "Processing $source...";
 				// Hash the msgid and msgctxt
 				$stringId = hash('sha256', $context . $source);
 				$transState = $entry->isFuzzy() ? 'NeedReview' : 'Approved';
@@ -355,11 +365,10 @@ class ZanataApiCurlRequest {
 						"content" => $target,
 						"extensions" => array()));
 				}
-				//echo "Done\n";
 			}
 		}
 
-		echo "Done preparing all entries\n";
+		echo "Done\n";
 
 		// Prepare the JSON content to send via cURL
 		$putTranslationsJson = json_encode(array(
@@ -373,6 +382,7 @@ class ZanataApiCurlRequest {
         $this->getZanataApiUrl()->translatedDocResourceService($projectSlug, $iterationSlug, $sourceDocName, $locale, 'import'),
         $this->getPutOptions($putTranslationsJson),
         $this->isVerbose,
+        $this->isInDebug,
         "Uploading translations for $sourceDocName to project $projectSlug($iterationSlug)");
 
     // Execute it

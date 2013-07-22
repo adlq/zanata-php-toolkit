@@ -29,9 +29,12 @@ class CurlWrapper
 	 * @param string	$url The cURL URL
 	 * @param array		$options The cURL options
    * @param boolean $verbose True to enable verbose mode
+   * @param boolean $debug True to enable debug mode
+   * @param string 	$description Description of the cURL request (needed in verbose mode)
 	 */
 	public function __construct($url, $options,
       $verbose = false,
+      $debug = false,
       $description = '')
 	{
 		if ($url !== '')
@@ -44,8 +47,13 @@ class CurlWrapper
 			// Set cURL options
 			$this->options = $options;
 			curl_setopt_array($this->getHandle(), $this->getOptions());
-			curl_setopt($this->getHandle(), CURLOPT_NOPROGRESS, false);
-			curl_setopt($this->getHandle(), CURLOPT_PROGRESSFUNCTION, array('CurlWrapper', 'progressCallback'));
+
+			// Debug mode
+			if ($debug) {
+				curl_setopt($this->getHandle(), CURLOPT_NOPROGRESS, false);
+				curl_setopt($this->getHandle(), CURLOPT_PROGRESSFUNCTION, array('CurlWrapper', 'progressCallback'));
+			}
+
 		}
 	}
 

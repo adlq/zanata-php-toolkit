@@ -73,12 +73,10 @@ class ZanataPHPToolkit
 	 * @return	boolean	  False if the push has succeeded, True otherwise
 	 *			(hook exit code)
 	 */
-	public function pushPotEntries($resourceFilePath, $sourceLocale)
+	public function pushPotEntries($resourceFilePath, $sourceDocName, $sourceLocale)
 	{
 		// Extract the source document name from the absolute path
 		$basename = basename($resourceFilePath);
-		$sourceDocName = pathinfo($basename, PATHINFO_FILENAME);
-
 
     // Parse the resource (POT) file
     $potFile = new POFile($resourceFilePath);

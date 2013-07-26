@@ -10,9 +10,9 @@ if (count($argv) < 3)
 require_once('conf.php');
 require_once('ZanataPHPToolkit.php');
 
-$zanataUrl = $ZANATA['conf']['zanata']['url'];
-$user = $ZANATA['conf']['zanata']['user'];
-$apiKey = $ZANATA['conf']['zanata']['apiKey'];
+$zanataUrl = $GLOBALS['conf']['zanata']['url'];
+$user = $GLOBALS['conf']['zanata']['user'];
+$apiKey = $GLOBALS['conf']['zanata']['apiKey'];
 $projectSlug = '';
 $iterationSlug = '';
 
@@ -21,10 +21,10 @@ $repoName = $argv[1];
 $potFilePath = $argv[2];
 
 // Attempt to find the repo name in the config.ini file
-if (isset($ZANATA['conf']['repos'][$repoName]))
+if (isset($GLOBALS['conf']['repos'][$repoName]))
 {
-	$projectSlug = $ZANATA['conf']['repos'][$repoName]['projectSlug'];
-	$iterationSlug = $ZANATA['conf']['repos'][$repoName]['iterationSlug'];
+	$projectSlug = $GLOBALS['conf']['repos'][$repoName]['projectSlug'];
+	$iterationSlug = $GLOBALS['conf']['repos'][$repoName]['iterationSlug'];
 }
 else
 {

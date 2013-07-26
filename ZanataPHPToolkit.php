@@ -1,6 +1,6 @@
 <?php
 require_once('conf.php');
-require_once($ZANATA['paths']['pophp'] . 'POFile.php');
+require_once($GLOBALS['paths']['pophp'] . 'POFile.php');
 require_once('ZanataApiCurlRequest.php');
 
 /**

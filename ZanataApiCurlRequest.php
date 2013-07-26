@@ -197,7 +197,8 @@ class ZanataApiCurlRequest {
 
 		foreach($chunks as $id => $chunk)
 		{
-			echo "Processing chunk #$id...\n";
+			if ($this->isInDebug)
+				echo "Processing chunk #$id...\n";
 
 			// Accumulate pot entries
 			$accChunk = array_merge($accChunk, $chunk);

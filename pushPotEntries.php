@@ -28,7 +28,7 @@ if (isset($GLOBALS['conf']['repos'][$repoName]))
 }
 else
 {
-	exit('Unknown project, no section $repoName in conf.php file');
+	exit("Unknown project, no section $repoName in conf.php file");
 }
 
 // Update the source entries on Zanata!

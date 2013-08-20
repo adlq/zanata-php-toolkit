@@ -96,7 +96,7 @@ class ZanataApiCurlRequest {
   /**
    * Create or modify a project on Zanata
    *
-   * @param type $projectSlug
+   * @param string $projectSlug
    * @return boolean True if the operation was successful, False
    * otherwise
    */

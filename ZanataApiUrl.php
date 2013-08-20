@@ -1,8 +1,9 @@
 <?php
+require_once('IZanataUrl.php');
 /**
  * Craft the required Zanata API URL
  */
-class ZanataApiUrl
+class ZanataApiUrl implements IZanataUrl
 {
 	// Base URL of the Zanata instance
 	private $baseUrl;

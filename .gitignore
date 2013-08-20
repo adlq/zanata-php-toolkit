@@ -169,3 +169,6 @@ pip-log.txt
 
 # PHP config file
 conf.php
+
+# PhpStorm
+.idea/

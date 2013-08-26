@@ -224,7 +224,7 @@ class ZanataPHPToolkit
 									INNER JOIN HProject AS project
 										ON project.id = it.project_id
 									WHERE doc.name LIKE :doc
-									AND tf.obsolete > 0
+									AND tf.obsolete = 0
 									AND project.slug LIKE :project
 									AND it.slug LIKE :iteration
 									AND tf.content0 LIKE :string

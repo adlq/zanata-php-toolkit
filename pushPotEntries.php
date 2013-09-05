@@ -1,9 +1,9 @@
 <?php
 // Check that all required arguments were passed
-if (count($argv) < 3)
+if (count($argv) < 4)
 {
-	echo 'Syntax is "php pushPotEntries.php repoName potfile.pot"' . "\n";
-	echo 'e.g. php pushPotEntries.php trunk.elms trunk.elms.pot' . "\n";
+	echo 'Syntax is "php pushPotEntries.php repoName potfile.pot sourceDocName"' . "\n";
+	echo 'e.g. php pushPotEntries.php trunk.elms trunk.elms.pot sourceDocName' . "\n";
 	exit("Missing parameters");
 }
 
@@ -19,6 +19,7 @@ $iterationSlug = '';
 // Extract the repo name and POT file path from the parameters
 $repoName = $argv[1];
 $potFilePath = $argv[2];
+$sourceDocName = $argv[3];
 
 // Attempt to find the repo name in the config.ini file
 if (isset($GLOBALS['conf']['repos'][$repoName]))
@@ -34,5 +35,5 @@ else
 // Update the source entries on Zanata!
 $zanataToolkit = new ZanataPHPToolkit($user, $apiKey, $projectSlug, $iterationSlug, $zanataUrl, true);
 
-exit($zanataToolkit->pushPotEntries($potFilePath, 'en-GB'));
+exit($zanataToolkit->pushPotEntries($potFilePath, $sourceDocName, 'en-GB'));
 ?>

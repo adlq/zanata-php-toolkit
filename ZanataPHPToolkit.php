@@ -77,8 +77,8 @@ class ZanataPHPToolkit
 	 * @param string $resourceFilePath Full path to the POT file
 	 * @param string $sourceDocName Name of the source document to push to
 	 * @param string $sourceLocale The source locale
-	 * @return	boolean	  False if the push has succeeded, True otherwise
-	 *			(hook exit code)
+	 * @return	boolean	  True if the push has succeeded, False otherwise
+	 *
 	 */
 	public function pushPotEntries($resourceFilePath, $sourceDocName, $sourceLocale)
 	{
@@ -101,8 +101,8 @@ class ZanataPHPToolkit
 	 * @param string $resourceFilePath Absolute path to the PO file
 	 * @param string $sourceDocName Name of the source document on Zanata
 	 * @param string $destLocale Name of the target locale
-	 * @return boolean False if the push has succeeded, True otherwise
-	 *			(hook exit code)
+	 * @return boolean True if the push has succeeded, False otherwise
+	 *
 	 */
 	public function pushTranslations(
 			$resourceFilePath,
